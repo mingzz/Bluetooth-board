@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -53,7 +56,7 @@ public class MainActivity extends Activity {
     private Map<String,BluetoothDevice> deviceMap = new HashMap<String, BluetoothDevice>();
     private List<String> deviceNames = new ArrayList<String>();
     private Button buttonTour;
-
+    //private ImageView imgView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,8 @@ public class MainActivity extends Activity {
         buttonReScanDevices = (Button)findViewById(R.id.buttonReScanDevices);
         buttonTour = (Button)findViewById(R.id.buttonTour);
         layoutConnectBluetooth.setVisibility(View.GONE);
+        //imgView = (ImageView) findViewById(R.id.SJTU);
+        //imgView.setImageResource(R.drawable.sjtu);
     }
 
     private void initListener(){

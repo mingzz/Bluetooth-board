@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -73,6 +74,9 @@ public class SubActivity extends Activity {
         registerReceiver(inputStreamReceiver,intentFilter);
     }
 
+    /**
+     * 初始化功能
+     */
     private void initFunction(){
         SetBaud.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -95,7 +99,8 @@ public class SubActivity extends Activity {
 
         SendText.setOnEditorActionListener(mWriteListener);
 
-        // Initialize the send button with a listener that for click events
+
+         //初始化按钮，发送左边框里的内容
         SendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Send a message using content of the edit text widget
@@ -103,11 +108,27 @@ public class SubActivity extends Activity {
                 //if (null != view) {
                     TextView textView = (TextView) findViewById(R.id.edit_text_out);
                 int len=textView.getText().length();
+                Log.d(String.valueOf(len), "length is :");
                     if(len>0) {
-                        char[] message= new char [len+1];
+                        char[] message= new char [len/2];
+                        int sum = 0, count = 0, j = 0;
                         for (int i = 0; i < textView.getText().length(); i++) {
-                            message[i] = textView.getText().charAt(i);
+                            char tmp = textView.getText().charAt(i);
+                            Log.d(String.valueOf(tmp), "tmp is :");
+                            if(tmp <= '9' && tmp >= '0')
+                                sum += (tmp - '0');
+                            else
+                                sum += tmp - 'A' + 10;
+                            if(count == 0) {
+                                sum *= 16;
+                                ++count;
+                            } else {
+                                message[j++] = (char)sum;
+                                sum = 0;
+                                count = 0;
+                            }
                         }
+                        Log.d(String.valueOf(message), "message is :");
                         sendMessage(message);
                     }
                 //}
@@ -115,6 +136,9 @@ public class SubActivity extends Activity {
         });
     }
 
+    /**
+     * 设置发送框，可以用回车触发
+     */
     private TextView.OnEditorActionListener mWriteListener
             = new TextView.OnEditorActionListener() {
         public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
@@ -122,10 +146,25 @@ public class SubActivity extends Activity {
             if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
                 int len=view.getText().length();
                 if(len>0) {
-                    char[] message= new char [len+1];
+                    char[] message= new char [len/2];
+                    int sum = 0, count = 0, j = 0;
                     for (int i = 0; i < view.getText().length(); i++) {
-                        message[i] = view.getText().charAt(i);
+                        char tmp = view.getText().charAt(i);
+                        Log.d(String.valueOf(tmp), "tmp is :");
+                        if(tmp <= '9' && tmp >= '0')
+                            sum += (tmp - '0');
+                        else
+                            sum += tmp - 'A' + 10;
+                        if(count == 0) {
+                            sum *= 16;
+                            ++count;
+                        } else {
+                            message[j++] = (char)sum;
+                            sum = 0;
+                            count = 0;
+                        }
                     }
+                    message[j] = '\0';
                     sendMessage(message);
                 }
             }
@@ -149,6 +188,7 @@ public class SubActivity extends Activity {
         for(int i = 0; i < s.length; ++i) {
             int ch = (int) s[i];
             String s4 = Integer.toHexString(ch);
+            if(s4.length() == 1) s4 = '0' + s4;
             str = str + s4;
         }
         textViewLogs.setText(str);

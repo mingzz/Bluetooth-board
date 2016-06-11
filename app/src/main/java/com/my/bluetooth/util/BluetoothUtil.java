@@ -235,6 +235,8 @@ public class BluetoothUtil {
                         Intent intent = new Intent();
                         intent.setAction(ACTION_RECEIVE_MESSAGE);
                         intent.putExtra("receiveMsg",s);
+                        String p = Integer.valueOf(pos).toString();
+                        intent.putExtra("len", p);
                         context.sendBroadcast(intent);
                     } else {
                         buffer_data[pos++] = 0x0A;

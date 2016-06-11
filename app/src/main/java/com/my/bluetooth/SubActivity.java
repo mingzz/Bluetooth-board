@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,6 +36,11 @@ public class SubActivity extends Activity {
 
     private char[] LedOff = {0x0A,0x10,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0xAD ,0xCE};
     private char[] LedOn = {0x0A ,0x10 ,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x02 ,0x00 ,0x05 ,0xCC ,0x0D};
+    private int newline = 0;
+    private int showline = 0;
+    private int lastlen = 0;
+    private String showMsg = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +86,7 @@ public class SubActivity extends Activity {
     private void initFunction(){
         SetBaud.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                newline++;
                 sendMessage(LedOn);
             }
         });
@@ -88,10 +95,12 @@ public class SubActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     // The toggle is enabled
+                    newline++;
                     sendMessage(LedOn);
 
                 } else {
                     // The toggle is disabled
+                    newline++;
                     sendMessage(LedOff);
                 }
             }
@@ -128,6 +137,7 @@ public class SubActivity extends Activity {
                                 count = 0;
                             }
                         }
+                        newline++;
                         Log.d(String.valueOf(message), "message is :");
                         sendMessage(message);
                     }
@@ -176,7 +186,22 @@ public class SubActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String s = intent.getStringExtra("receiveMsg");
-            textViewLogs.setText("收到消息："+s);
+            String p = intent.getStringExtra("len");
+            int len = 0, i = 0;
+            while(i < p.length()) {
+                len *= 10;
+                len += p.charAt(i) - '0';
+                ++i;
+            }
+            //s.length();
+            String s2 = s.substring(lastlen, len*2);
+            if(newline > showline){
+                showline++;
+                showMsg = showMsg + '\n';
+            }
+            showMsg = showMsg + s2;
+            textViewLogs.setText("收到消息："+showMsg);
+            lastlen = len * 2;
         }
     };
 

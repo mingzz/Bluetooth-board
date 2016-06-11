@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
     private Map<String,BluetoothDevice> deviceMap = new HashMap<String, BluetoothDevice>();
     private List<String> deviceNames = new ArrayList<String>();
     private Button buttonTour;
-    //private ImageView imgView;
+    private ImageView imgView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +80,8 @@ public class MainActivity extends Activity {
         buttonReScanDevices = (Button)findViewById(R.id.buttonReScanDevices);
         buttonTour = (Button)findViewById(R.id.buttonTour);
         layoutConnectBluetooth.setVisibility(View.GONE);
-        //imgView = (ImageView) findViewById(R.id.SJTU);
-        //imgView.setImageResource(R.drawable.sjtu);
+        imgView = (ImageView) findViewById(R.id.sjtu);
+        imgView.setImageResource(R.drawable.sjtu);
     }
 
     private void initListener(){

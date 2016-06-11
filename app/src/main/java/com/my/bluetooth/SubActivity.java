@@ -106,7 +106,7 @@ public class SubActivity extends Activity {
                 // Send a message using content of the edit text widget
                 //View view = getView();
                 //if (null != view) {
-                    TextView textView = (TextView) findViewById(R.id.edit_text_out);
+                TextView textView = (TextView) findViewById(R.id.edit_text_out);
                 int len=textView.getText().length();
                 Log.d(String.valueOf(len), "length is :");
                     if(len>0) {
@@ -164,7 +164,6 @@ public class SubActivity extends Activity {
                             count = 0;
                         }
                     }
-                    message[j] = '\0';
                     sendMessage(message);
                 }
             }

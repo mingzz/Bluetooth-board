@@ -59,6 +59,18 @@
                     android:layout_height="wrap_content"
                     android:text="OK"/>
             </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+                <ImageView
+                    android:id="@+id/sjtu"
+                    android:layout_height="186dp"
+                    android:layout_width="186dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/sjtu" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

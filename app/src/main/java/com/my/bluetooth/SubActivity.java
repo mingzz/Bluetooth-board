@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.util.LogPrinter;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -21,6 +23,8 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.my.bluetooth.util.BluetoothUtil;
+
+import java.io.InputStream;
 
 public class SubActivity extends Activity {
     //蓝牙
@@ -49,6 +53,10 @@ public class SubActivity extends Activity {
     private int LedLevel = 0;
     private String showMsg = "";
 
+    private int BaudFlag = 0;
+    private int cnt = 0;
+    private int startRec = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +84,7 @@ public class SubActivity extends Activity {
         Increase = (Button) findViewById(R.id.Increase);
         Decrease = (Button) findViewById(R.id.Decrease);
         textViewLogs = (TextView) findViewById(R.id.textViewLogs);
+        textViewLogs.setMovementMethod(ScrollingMovementMethod.getInstance()) ;
         SendText = (EditText) findViewById(R.id.edit_text_out);
         SendButton = (Button) findViewById(R.id.button_send);
     }
@@ -96,14 +105,29 @@ public class SubActivity extends Activity {
     private void initFunction(){
         SetBaud.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                newline++;
-                sendMessage(BreatheOn);
+                Intent intent = new Intent();
+                String Recflag;
+                int times = 2;
+                while(times-- > 0) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    newline++;
+                    BaudFlag = 1;
+                    sendMessage(Lv1);
+                   // Recflag = intent.getStringExtra("Recflag");
+                    //if(Recflag.charAt(0) == '1') startRec = 1;
+                }
             }
         });
 
         LED.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    BaudFlag=0;
                     // The toggle is enabled
                     newline++;
                     sendMessage(BreatheOff);
@@ -118,6 +142,7 @@ public class SubActivity extends Activity {
 
         Increase.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                BaudFlag=0;
                 newline++;
                 LedLevel = (LedLevel == 4) ? LedLevel : LedLevel+1;
                 switch(LedLevel){
@@ -139,6 +164,7 @@ public class SubActivity extends Activity {
 
         Decrease.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                BaudFlag=0;
                 newline++;
                 LedLevel = (LedLevel == 0) ? LedLevel : LedLevel-1;
                 switch(LedLevel){
@@ -162,6 +188,7 @@ public class SubActivity extends Activity {
          //初始化按钮，发送左边框里的内容
         SendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                BaudFlag=0;
                 // Send a message using content of the edit text widget
                 //View view = getView();
                 //if (null != view) {
@@ -206,6 +233,7 @@ public class SubActivity extends Activity {
         public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
             // If the action is a key-up event on the return key, send the message
             if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
+                BaudFlag=0;
                 int len=view.getText().length();
                 if(len>0) {
                     char[] message= new char [len/2];
@@ -240,6 +268,7 @@ public class SubActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String s = intent.getStringExtra("receiveMsg");
             String p = intent.getStringExtra("len");
+            String Recflag = intent.getStringExtra("Recflag");
             int len = 0, i = 0;
             while(i < p.length()) {
                 len *= 10;
@@ -249,8 +278,21 @@ public class SubActivity extends Activity {
             //s.length();
             String s2 = s.substring(lastlen, len*2);
             if(newline > showline){
-                showline++;
+                showline = newline;
                 showMsg = showMsg + '\n';
+                if(BaudFlag == 1){
+                    if(Recflag.charAt(0) == '1') startRec = 1;
+                    Log.d(String.valueOf(cnt),"In!!!!!!!!!!!!1");
+                    if (cnt <  2) {
+                        newline++;
+                        sendMessage(Lv1);
+                    }
+                    if (s2.charAt(0)=='6' && s2.charAt(1)=='1'){
+                        Log.d(s2, "now is :");
+                        cnt += 1;
+                        if (cnt >= 2) BaudFlag=0;
+                    }
+                }
             }
             showMsg = showMsg + s2;
             textViewLogs.setText("收到消息："+showMsg);

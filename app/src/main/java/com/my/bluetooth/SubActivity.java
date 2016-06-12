@@ -27,18 +27,26 @@ public class SubActivity extends Activity {
     private BluetoothUtil bluetoothUtil;
 
     //基础控件
-    //private RelativeLayout layout1;//基础控件层
     private TextView textViewLogs;
     private ToggleButton LED;
+    private Button Decrease;
+    private Button Increase;
     private Button SetBaud;
     private Button SendButton;
     private EditText SendText;
 
+    private char[] BreatheOff = {0x0A,0x10,0x00 ,0x01 ,0x00 ,0x02, 0x04 ,0x00 ,0x00 ,0x00 ,0x00 , 0x17, 0x47};
+    private char[] BreatheOn = {0x0A, 0x10, 0x00, 0x01, 0x00, 0x02, 0x04, 0x00, 0x01, 0x00, 0x00, 0x46, 0x87};
     private char[] LedOff = {0x0A,0x10,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0x00 ,0xAD ,0xCE};
-    private char[] LedOn = {0x0A ,0x10 ,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x02 ,0x00 ,0x05 ,0xCC ,0x0D};
+    private char[] Lv1 = {0x0A, 0x10, 0x00, 0x01, 0x00, 0x03, 0x06, 0x00, 0x00, 0x00, 0x02, 0x00, 0x01, 0xCD, 0xCE};
+    private char[] Lv2 = {0x0A ,0x10 ,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x02 ,0x00 ,0x05 ,0xCC ,0x0D};
+    private char[] Lv3 = {0x0A, 0x10, 0x00, 0x01, 0x00, 0x03, 0x06, 0x00, 0x00, 0x00, 0x02, 0x00, 0x10, 0x0D, 0xC2};
+    private char[] Lv4 = {0x0A ,0x10 ,0x00 ,0x01 ,0x00 ,0x03 ,0x06 ,0x00 ,0x00 ,0x00 ,0x02 ,0x00 ,0x20, 0x0D, 0xD6};
+
     private int newline = 0;
     private int showline = 0;
     private int lastlen = 0;
+    private int LedLevel = 0;
     private String showMsg = "";
 
     @Override
@@ -65,6 +73,8 @@ public class SubActivity extends Activity {
     private void initView() {
         SetBaud = (Button) findViewById(R.id.SetBaud);
         LED = (ToggleButton) findViewById(R.id.LED);
+        Increase = (Button) findViewById(R.id.Increase);
+        Decrease = (Button) findViewById(R.id.Decrease);
         textViewLogs = (TextView) findViewById(R.id.textViewLogs);
         SendText = (EditText) findViewById(R.id.edit_text_out);
         SendButton = (Button) findViewById(R.id.button_send);
@@ -87,7 +97,7 @@ public class SubActivity extends Activity {
         SetBaud.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 newline++;
-                sendMessage(LedOn);
+                sendMessage(BreatheOn);
             }
         });
 
@@ -96,12 +106,52 @@ public class SubActivity extends Activity {
                 if (isChecked) {
                     // The toggle is enabled
                     newline++;
-                    sendMessage(LedOn);
+                    sendMessage(BreatheOff);
 
                 } else {
                     // The toggle is disabled
                     newline++;
-                    sendMessage(LedOff);
+                    sendMessage(BreatheOn);
+                }
+            }
+        });
+
+        Increase.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                newline++;
+                LedLevel = (LedLevel == 4) ? LedLevel : LedLevel+1;
+                switch(LedLevel){
+                    case 0:
+                        break;
+                    case 1:
+                        sendMessage(Lv1);break;
+                    case 2:
+                        sendMessage(Lv2);break;
+                    case 3:
+                        sendMessage(Lv3);break;
+                    case 4:
+                        sendMessage(Lv4);break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+        Decrease.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                newline++;
+                LedLevel = (LedLevel == 0) ? LedLevel : LedLevel-1;
+                switch(LedLevel){
+                    case 0:
+                        sendMessage(LedOff);break;
+                    case 1:
+                        sendMessage(Lv1);break;
+                    case 2:
+                        sendMessage(Lv2);break;
+                    case 3:
+                        sendMessage(Lv3);break;
+                    default:
+                        break;
                 }
             }
         });
@@ -126,8 +176,10 @@ public class SubActivity extends Activity {
                             Log.d(String.valueOf(tmp), "tmp is :");
                             if(tmp <= '9' && tmp >= '0')
                                 sum += (tmp - '0');
-                            else
-                                sum += tmp - 'A' + 10;
+                            else if(tmp <= 'F' && tmp >= 'A')
+                                    sum += tmp - 'A' + 10;
+                                else
+                                    sum += tmp - 'a' + 10;
                             if(count == 0) {
                                 sum *= 16;
                                 ++count;
@@ -163,8 +215,10 @@ public class SubActivity extends Activity {
                         Log.d(String.valueOf(tmp), "tmp is :");
                         if(tmp <= '9' && tmp >= '0')
                             sum += (tmp - '0');
-                        else
-                            sum += tmp - 'A' + 10;
+                        else if(tmp <= 'F' && tmp >= 'A')
+                                sum += tmp - 'A' + 10;
+                            else
+                                sum += tmp - 'a' + 10;
                         if(count == 0) {
                             sum *= 16;
                             ++count;

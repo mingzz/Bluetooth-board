@@ -9,10 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.util.LogPrinter;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -112,14 +110,11 @@ public class SubActivity extends Activity {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                     newline++;
                     BaudFlag = 1;
                     sendMessage(Lv1);
-                   // Recflag = intent.getStringExtra("Recflag");
-                    //if(Recflag.charAt(0) == '1') startRec = 1;
                 }
             }
         });

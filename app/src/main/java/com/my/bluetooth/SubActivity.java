@@ -285,7 +285,10 @@ public class SubActivity extends Activity {
                     if (s2.charAt(0)=='6' && s2.charAt(1)=='1'){
                         Log.d(s2, "now is :");
                         cnt += 1;
-                        if (cnt >= 2) BaudFlag=0;
+                        if (cnt >= 2) {
+                            BaudFlag = 0;
+                            cnt = 0;
+                        }
                     }
                 }
             }
